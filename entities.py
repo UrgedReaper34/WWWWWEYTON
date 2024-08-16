@@ -80,9 +80,9 @@ class Player(Entity):
     def kick(self, monster):
         monster.take_damage(10)
 
-    def use_item(self, item_index):
+    def use_item(self, item_index, monster):
         item = self.inventory[item_index - 1]
-        item.use_item()
+        item.use_item(monster)
 
     def get_inventory(self):
         return self.inventory
