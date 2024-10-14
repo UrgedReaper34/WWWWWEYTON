@@ -1,8 +1,6 @@
-
 import random
 
 import entities
-
 
 
 class Level:
@@ -10,11 +8,14 @@ class Level:
     generate new level by the size given
     level_num --> int
     """
-    def __init__(self, tile_list,monsters_list,items_list):
+
+    def __init__(self, tile_list, monsters_list, items_list):
         self.tile_list = tile_list
         self.monsters_list = monsters_list
         self.items_list = items_list
-        self.BigBoss = entities.Monsters("BIGBOSS", 1000, [20,10], 250, "FINAL BOSS, Defeat to Complete Level")
+        self.BigBoss = entities.Monsters(
+            "BIGBOSS", 1000, [20, 10], 250,
+            "FINAL BOSS, Defeat to Complete Level")
 
     def get_floorplan(self):
         """
@@ -22,12 +23,11 @@ class Level:
         """
         return self.tile_list
 
-
     def spawn_BigBoss(self):
         last_tile = self.tile_list[-1]
         last_tile.set_monster(self.BigBoss)
         self.BigBoss.position = last_tile
-        
+
     def spawn_monsters(self):
         """
         randomly add monsters into tiles
@@ -53,11 +53,6 @@ class Level:
                 i -= 1
 
 
-
-
-
-
-
 class Tile:
 
     def __init__(self, position, description):
@@ -71,20 +66,15 @@ class Tile:
 
     def get_description(self):
         return self.description
-    
-    def set_monster(self,monster):
+
+    def set_monster(self, monster):
         self.monster = monster
 
-    def set_item(self,item):
+    def set_item(self, item):
         self.item = item
-    
+
     def get_item(self):
         return self.item
 
     def get_monster(self):
         return self.monster
-
-
-
-
-

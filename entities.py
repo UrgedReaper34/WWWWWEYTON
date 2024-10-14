@@ -1,4 +1,3 @@
-
 class Entity:
 
     def __init__(self, name, health, position):
@@ -50,7 +49,6 @@ class Entity:
                 self.position[1] += 1
                 return self.get_position()
 
-
         elif move in "Dd":
             if self.get_position()[0] >= 20:
                 return "invalid"
@@ -59,11 +57,9 @@ class Entity:
                 return self.get_position()
 
 
-
-
 class Player(Entity):
 
-    def __init__(self, name, health, aura, position, inventory = []):
+    def __init__(self, name, health, aura, position, inventory=[]):
         super().__init__(name, health, position)
         self.inventory = inventory
         self.aura = aura
@@ -71,23 +67,23 @@ class Player(Entity):
     def get_aura(self):
         return self.aura
 
-    def set_aura(self,aura):
+    def set_aura(self, aura):
         self.aura = aura
 
-    def gain_aura(self,aura_gained):
+    def gain_aura(self, aura_gained):
         self.aura += aura_gained
 
-    def add_item(self,item):
+    def add_item(self, item):
         self.inventory.append(item)
 
-    def remove_item(self,item_index):
+    def remove_item(self, item_index):
         self.inventory.pop(item_index)
 
     def punch(self, monster):
-        monster.take_damage(5*(1+self.aura/100))
+        monster.take_damage(5 * (1 + self.aura / 100))
 
     def kick(self, monster):
-        monster.take_damage(10*(1+self.aura/100))
+        monster.take_damage(10 * (1 + self.aura / 100))
 
     def use_item(self, item_index, monster):
         item = self.inventory[item_index]
@@ -103,7 +99,6 @@ class Monsters(Entity):
         super().__init__(name, health, position)
         self.damage = damage
         self.description = description
-
 
     def get_damage(self):
         return self.damage
@@ -121,7 +116,6 @@ class Monsters(Entity):
         print(f'Damage: {self.get_damage()}\n')
 
 
-
 # test
 # person1 = Player("Lleyton",100000,10,[1,2])
 
@@ -132,6 +126,3 @@ class Monsters(Entity):
 #     "LEFT" : None
 # }
 # print(person1.move("RIGHT",adj_tiles))
-
-
-

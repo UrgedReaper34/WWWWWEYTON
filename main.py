@@ -17,15 +17,12 @@ if __name__ == "__main__":
             if x == 'invalid':
                 print("\033c", end="", flush=True)
 
-
         print("\033c", end="", flush=True)
     game.show_status()
     sleep(3)
     print("\033c", end="", flush=True)
-    
+
     if game.win():
         print("You have slained the BigBoss, you win")
     else:
         print("You died, restart as you are unworthy")
-
-

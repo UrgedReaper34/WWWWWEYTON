@@ -1,13 +1,14 @@
 class Map:
+
     def __init__(self, width=20, height=20):
         self.width = width
         self.height = height
         self.grid = [['.' for _ in range(width)] for _ in range(height)]
-        self.player_position = [0, 0]  
-        self.final_boss_position = [19,19]
+        self.player_position = [0, 0]
+        self.final_boss_position = [19, 19]
         self.grid[self.player_position[1]][self.player_position[0]] = 'P'
-        self.grid[self.final_boss_position[1]][self.final_boss_position[0]] = 'B'
-        
+        self.grid[self.final_boss_position[1]][
+            self.final_boss_position[0]] = 'B'
 
     def get_player_position(self):
         return self.player_position
