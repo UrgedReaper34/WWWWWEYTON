@@ -3,175 +3,175 @@
         "type": "HealthPotion",
         "name": "Small Health Potion",
         "description": "Restores a small amount of health.",
-        "health_gain": 20
+        "effect": 20
     },
     {
         "type": "HealthPotion",
         "name": "Medium Health Potion",
         "description": "Restores a moderate amount of health.",
-        "health_gain": 50
+        "effect": 50
     },
     {
         "type": "HealthPotion",
         "name": "Large Health Potion",
         "description": "Restores a large amount of health.",
-        "health_gain": 100
+        "effect": 100
     },
     {
         "type": "HealthPotion",
         "name": "Elixir of Life",
         "description": "Fully restores health.",
-        "health_gain": 200
+        "effect": 200
     },
     {
         "type": "HealthPotion",
         "name": "Mega Health Potion",
         "description": "Restores a massive amount of health.",
-        "health_gain": 300
+        "effect": 300
     },
     {
         "type": "HealthPotion",
         "name": "Ultimate Health Potion",
         "description": "Maximizes the player's health.",
-        "health_gain": 500
+        "effect": 500
     },
     {
         "type": "HealthPotion",
         "name": "Mystic Elixir",
         "description": "Heals all wounds and grants extra health.",
-        "health_gain": 250
+        "effect": 250
     },
     {
         "type": "HealthPotion",
         "name": "Herbal Tonic",
         "description": "A restorative potion made from rare herbs.",
-        "health_gain": 60
+        "effect": 60
     },
     {
         "type": "HealthPotion",
         "name": "Phoenix Feather Elixir",
         "description": "Grants the drinker the vitality of a phoenix.",
-        "health_gain": 350
+        "effect": 350
     },
     {
         "type": "HealthPotion",
         "name": "Dragon's Blood Potion",
         "description": "Restores a significant amount of health.",
-        "health_gain": 400
+        "effect": 400
     },
     {
         "type": "HealthPotion",
         "name": "Vampire's Draught",
         "description": "Absorbs life from enemies and restores health.",
-        "health_gain": 200
+        "effect": 200
     },
     {
         "type": "HealthPotion",
         "name": "Healing Waters",
         "description": "A rare potion made from enchanted spring water.",
-        "health_gain": 150
+        "effect": 150
     },
     {
         "type": "HealthPotion",
         "name": "Spirit Elixir",
         "description": "Restores health and cleanses negative effects.",
-        "health_gain": 120
+        "effect": 120
     },
     {
         "type": "HealthPotion",
         "name": "Potion of Rejuvenation",
         "description": "Rejuvenates the body, restoring a large amount of health.",
-        "health_gain": 180
+        "effect": 180
     },
     {
         "type": "HealthPotion",
         "name": "Elixir of Vitality",
         "description": "Boosts health and stamina.",
-        "health_gain": 220
+        "effect": 220
     },
     {
         "type": "AuraPotion",
         "name": "Small Aura Potion",
         "description": "Increases aura by a small amount.",
-        "aura_gain": 15
+        "effect": 15
     },
     {
         "type": "AuraPotion",
         "name": "Medium Aura Potion",
         "description": "Increases aura by a moderate amount.",
-        "aura_gain": 30
+        "effect": 30
     },
     {
         "type": "AuraPotion",
         "name": "Large Aura Potion",
         "description": "Increases aura by a large amount.",
-        "aura_gain": 60
+        "effect": 60
     },
     {
         "type": "AuraPotion",
         "name": "Elixir of Radiance",
         "description": "A powerful potion that boosts aura significantly.",
-        "aura_gain": 100
+        "effect": 100
     },
     {
         "type": "AuraPotion",
         "name": "Mystic Aura Potion",
         "description": "Increases aura and enhances mystical abilities.",
-        "aura_gain": 120
+        "effect": 120
     },
     {
         "type": "AuraPotion",
         "name": "Potion of Enlightenment",
         "description": "Boosts the drinker's aura to a higher state.",
-        "aura_gain": 80
+        "effect": 80
     },
     {
         "type": "AuraPotion",
         "name": "Ancient Aura Potion",
         "description": "Grants the power of ancient auras.",
-        "aura_gain": 150
+        "effect": 150
     },
     {
         "type": "AuraPotion",
         "name": "Celestial Aura Potion",
         "description": "Blesses the drinker with celestial aura.",
-        "aura_gain": 200
+        "effect": 200
     },
     {
         "type": "AuraPotion",
         "name": "Divine Essence",
         "description": "A potion made from divine energy, greatly enhancing aura.",
-        "aura_gain": 250
+        "effect": 250
     },
     {
         "type": "AuraPotion",
         "name": "Potion of Clarity",
         "description": "Enhances aura and mental focus.",
-        "aura_gain": 70
+        "effect": 70
     },
     {
         "type": "AuraPotion",
         "name": "Elixir of the Ancients",
         "description": "Boosts aura with the wisdom of the ancients.",
-        "aura_gain": 180
+        "effect": 180
     },
     {
         "type": "AuraPotion",
         "name": "Phantom Elixir",
         "description": "Enhances aura with a mysterious, ghostly power.",
-        "aura_gain": 140
+        "effect": 140
     },
     {
         "type": "AuraPotion",
         "name": "Starlight Potion",
         "description": "Increases aura with the power of the stars.",
-        "aura_gain": 160
+        "effect": 160
     },
     {
         "type": "AuraPotion",
         "name": "Elixir of Shadows",
         "description": "Increases aura and grants stealthy abilities.",
-        "aura_gain": 90
+        "effect": 90
     },
     {
         "type": "Weapon",

@@ -46,30 +46,8 @@ class Game:
             self.monsters_list.append(monster)
 
     def initialise_items(self):
-
-        for _item in gamedata.items:
-            if _item["type"] == "HealthPotion":
-                item = items.HealthPotion(_item["type"],
-                                          _item["name"],
-                                          _item["description"],
-                                          player=self.player,
-                                          effect=_item["health_gain"])
-
-            elif _item["type"] == "AuraPotion":
-                item = items.AuraPotion(_item["type"],
-                                        _item["name"],
-                                        _item["description"],
-                                        player=self.player,
-                                        effect=_item["aura_gain"])
-
-            else:
-                item = items.Weapon(_item["type"],
-                                    _item["name"],
-                                    _item["description"],
-                                    player=self.player,
-                                    effect=_item["damage"])
-
-            self.items_list.append(item)
+        for itemdata in gamedata.items:
+            self.items_list.append(items.create_item(itemdata))
 
     def start(self):
         self.create_tiles()
@@ -124,24 +102,6 @@ class Game:
             return False
         return True
 
-    def menu_use_item(self) -> bool:
-        """Use the item in the player's inventory according to their choice"""
-        monster = self.get_player_tile().get_monster()
-        item = interface.prompt_item_choice(self.player.inventory)
-        if not item:
-            return False
-        elif (
-                monster
-                or isinstance(item, (items.HealthPotion, items.AuraPotion))
-        ):
-            self.player.use_item(item, monster)
-            self.player.remove_item(item)
-            interface.report_player_item_used(item.name)
-        else:
-            interface.report_no_monster()
-            return False
-        return True
-
     def punch(self) -> bool:
         """Execute a punch"""
         if self.get_player_tile().get_monster() is not None:
@@ -155,6 +115,36 @@ class Game:
         """Execute a kick"""
         if self.get_player_tile().get_monster() is not None:
             self.player.kick(self.get_player_tile().get_monster())
+        else:
+            interface.report_no_monster()
+            return False
+        return True
+
+    def use_item(self, user: entities.Player, item: items.Item, target: entities.Entity) -> None:
+        """Use the item on the target"""
+        if isinstance(item, items.Potion):
+            if isinstance(item, items.HealthPotion):
+                user.gain_health(item.effect)
+            elif isinstance(item, items.AuraPotion):
+                user.gain_aura(item.effect)
+        elif isinstance(item, items.Weapon):
+            target.take_damage(item.effect * (1 + user.aura / 100))
+        else:
+            raise ValueError(f"Invalid item type: {type(item)}")
+
+    def menu_use_item(self) -> bool:
+        """Use the item in the player's inventory according to their choice"""
+        monster = self.get_player_tile().get_monster()
+        item = interface.prompt_item_choice(self.player.inventory)
+        if not item:
+            return False
+        elif (
+                monster
+                or isinstance(item, (items.HealthPotion, items.AuraPotion))
+        ):
+            self.use_item(self.player, item, monster)
+            self.player.remove_item(item)
+            interface.report_player_item_used(item.name)
         else:
             interface.report_no_monster()
             return False
@@ -285,7 +275,7 @@ class Game:
         name_inventory = {}
         inventory = self.player.get_inventory()
         for item in inventory:
-            name_inventory[inventory.index(item) + 1] = item.get_name()
+            name_inventory[inventory.index(item) + 1] = item.name
         return name_inventory
 
     def get_player_health(self):

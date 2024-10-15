@@ -1,33 +1,11 @@
 class Item:
 
-    def __init__(self, type, name, description, player, effect):
+    def __init__(self, type, name, description, effect):
         self.type = type
         self.name = name
         self.description = description
-        self.player = player
         self.effect = effect
 
-    def get_name(self):
-        return self.name
-
-    def get_description(self):
-        return self.description
-
-    def get_type(self):
-        return self.type
-
-    def get_effect(self):
-        return self.effect
-
-
-class HealthPotion(Item):
-
-    def __init__(self, type, name, description, player, effect):
-        super().__init__(type, name, description, player, effect)
-
-    def use_item(self, monster):
-        self.player.gain_health(self.effect)
-
     def as_dict(self) -> dict:
         return {
             "type": self.type,
@@ -37,44 +15,30 @@ class HealthPotion(Item):
         }
 
     def display_item(self):
-        print(f'Item Type: {self.get_type()}')
-        print(f'Item Name: {self.get_name()}')
-        print(f'Item Description: {self.get_description()}')
-        if self.get_type() == "HealthPotion":
-            print(f'Health Gain: {self.get_effect()}')
+        print(f'Item Type: {self.type}')
+        print(f'Item Name: {self.name}')
+        print(f'Item Description: {self.description}')
+        if self.type == "HealthPotion":
+            print(f'Health Gain: {self.effect}')
+        elif self.type == "AuraPotion":
+            print(f'Aura Gain: {self.effect}')
+        elif self.type == "Weapon":
+            print(f'Damage: {self.effect}')
 
 
-class AuraPotion(Item):
+class Potion(Item):
+    """Potions are items with effects that apply to the user only."""
 
-    def __init__(self, type, name, description, player, effect):
-        super().__init__(type, name, description, player, effect)
 
-    def use_item(self, monster):
-        self.player.gain_aura(self.effect)
+class HealthPotion(Potion):
+    """Health potions are potions that heal the user."""
 
-    def as_dict(self) -> dict:
-        return {
-            "type": self.type,
-            "name": self.name,
-            "description": self.description,
-            "effect": self.effect
-        }
 
-    def display_item(self):
-        print(f'Item Type: {self.get_type()}')
-        print(f'Item Name: {self.get_name()}')
-        print(f'Item Description: {self.get_description()}')
-        if self.get_type() == "AuraPotion":
-            print(f'Aura Gain: {self.get_effect()}')
+class AuraPotion(Potion):
+    """Aura potions are potions that increase the user's aura."""
 
 
 class Weapon(Item):
-
-    def __init__(self, type, name, description, player, effect):
-        super().__init__(type, name, description, player, effect)
-
-    def use_item(self, monster):
-        monster.take_damage(self.effect * (1 + self.player.aura / 100))
 
     def as_dict(self) -> dict:
         return {
@@ -84,9 +48,32 @@ class Weapon(Item):
             "damage": self.effect
         }
 
-    def display_item(self):
-        print(f'Item Type: {self.get_type()}')
-        print(f'Item Name: {self.get_name()}')
-        print(f'Item Description: {self.get_description()}')
-        if self.get_type() == "Weapon":
-            print(f'Damage: {self.get_effect()}\n')
+
+def create_item(data: dict) -> Item:
+    """Generic factory function for items; uses multiple dispatch to determine
+    appropriate factory function to call.
+    """
+    if data["type"] == "HealthPotion":
+        return create_health_potion(data)
+    elif data["type"] == "AuraPotion":
+        return create_aura_potion(data)
+    elif data["type"] == "Weapon":
+        return create_weapon(data)
+
+
+def create_health_potion(data: dict) -> HealthPotion:
+    """Factory function for health potions."""
+    return HealthPotion(data["name"], data["health"], data["description"],
+                        data["effect"])
+
+
+def create_aura_potion(data: dict) -> AuraPotion:
+    """Factory function for aura potions."""
+    return AuraPotion(data["name"], data["aura"], data["description"],
+                      data["effect"])
+
+
+def create_weapon(data: dict) -> Weapon:
+    """Factory function for weapons."""
+    return Weapon(data["name"], data["damage"], data["description"],
+                  data["damage"])
