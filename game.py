@@ -1,3 +1,4 @@
+import command
 import entities
 import gamedata
 import level
@@ -7,7 +8,6 @@ import map
 import storyline
 from level import Tile
 from map import Map
-from time import sleep
 
 
 class Game:
@@ -94,12 +94,7 @@ class Game:
 
     def get_options(self) -> list[str]:
         """Returns player's current options as a list of strs"""
-        move_options = ["W", "A", "S", "D"]
-        combat_options = ["Z", "X", "(item number)"]
-        inventory_options = ["V", "R", "P", "help"
-                             "quit"]
-
-        return move_options + combat_options + inventory_options
+        return command.ALL_COMMANDS
 
     def move(self, choice) -> bool:
         """Move the player according to their choice"""
@@ -152,9 +147,9 @@ class Game:
             return False
         return True
 
-    def view_item(self):
+    def view_item(self) -> bool:
         x = input("Enter Item number ")
-        if x.isdecimal() is False:
+        if not x.isdecimal():
             interface.alert_invalid_input()
             return False
         x = int(x)
@@ -169,7 +164,7 @@ class Game:
     def drop_item(self) -> bool:
         """Drop the item in the player's inventory"""
         x = interface.prompt_item_number()
-        if x.isdecimal() is False:
+        if not x.isdecimal():
             interface.alert_invalid_input()
             return False
         x = int(x)
@@ -196,31 +191,31 @@ class Game:
     def enter(self, choice: str) -> bool:
         """Carry out user choice.
         Returns a bool representing whether the action was carried out.
+        Validation should be done before passing to this method.
         """
         choice = choice.lower()
-        if choice in "wasd":
+        if choice in command.MOVE:
             result = self.move(choice)
-        elif choice.isdecimal():
+        elif choice in command.USE_ITEM:
             result = self.use_item(choice)
-        elif choice == "z":
+        elif choice == command.PUNCH:
             result = self.punch()
-        elif choice == "x":
+        elif choice == command.KICK:
             result = self.kick()
-        elif choice == "v":
+        elif choice == command.VIEW_ITEM:
             result = self.view_item()
-        elif choice == "r":
+        elif choice == command.DROP_ITEM:
             result = self.drop_item()
-        elif choice == "p":
+        elif choice == command.PICKUP_ITEM:
             result = self.pick_up_item()
-        elif choice == "h" or choice == "help":
+        elif choice in command.HELP:
             interface.show_help()
             return True
-        elif choice == 'quit':
+        elif choice == command.QUIT:
             self.player.health = 0
             return True
         else:
-            interface.alert_invalid_option()
-            return False
+            raise ValueError(f"Invalid choice: {choice}")
 
         if self.get_player_tile().get_monster() is not None:
             self.damaged_by_monster()
