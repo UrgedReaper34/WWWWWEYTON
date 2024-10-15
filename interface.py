@@ -122,14 +122,15 @@ def report_no_monster():
     print("No monster on tile")
     short_pause()
 
+def report_no_item():
+    print("No item on tile")
+    short_pause()
+
 def report_monster_killed():
     print("You have killed the monster and gained 100 health")
 
-def report_tile_item_picked_up(item: str | None):
-    if item:
-        print(f"{item} added")
-    else:
-        print("No item on tile")
+def report_tile_item_picked_up(item: str):
+    print(f"{item} added")
     short_pause()
 
 def report_player_item_dropped(item: str):
