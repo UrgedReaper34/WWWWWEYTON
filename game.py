@@ -19,7 +19,6 @@ class Game:
         self.map = map.Map()
         self.storyline = storyline.Storyline()
         self.level = level.create_level()
-        self.tile_list = []
         self.player = entities.create_player(gamedata.player)
         player_x, player_y = gamedata.player["position"]
         self.map.set_player_position(player_x, player_y)
