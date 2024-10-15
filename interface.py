@@ -52,7 +52,11 @@ def prompt_name() -> str:
     return input("Brave adventurer! What is your name? \n")
 
 def prompt_item_number() -> str:
-    return input("Enter Item number ")
+    choice = input("Enter Item number ")
+    while not choice.isdecimal():
+        alert_invalid_input()
+        choice = input("Enter Item number ")
+    return choice
 
 def prompt_player_choice(options: list[str]) -> str:
     optionstr = " ".join(options)
