@@ -128,7 +128,7 @@ class Game:
             elif isinstance(item, items.AuraPotion):
                 user.gain_aura(item.effect)
         elif isinstance(item, items.Weapon):
-            target.take_damage(item.effect * (1 + user.aura / 100))
+            target.take_damage(int(item.effect * (1 + user.aura / 100)))
         else:
             raise ValueError(f"Invalid item type: {type(item)}")
 
@@ -138,17 +138,17 @@ class Game:
         item = interface.prompt_item_choice(self.player.inventory)
         if not item:
             return False
-        elif (
-                monster
-                or isinstance(item, (items.HealthPotion, items.AuraPotion))
-        ):
+        elif not monster:
+            interface.report_no_monster()
+            return False
+        else:
+            # Note: this will discard a weapon after use.
+            # Fix if this is unintended, or add another condition check
+            # for weapons
             self.use_item(self.player, item, monster)
             self.player.remove_item(item)
             interface.report_player_item_used(item.name)
-        else:
-            interface.report_no_monster()
-            return False
-        return True
+            return True
 
     def menu_view_item(self) -> bool:
         """View the item in the player's inventory according to their choice"""
