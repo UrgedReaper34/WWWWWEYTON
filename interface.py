@@ -72,7 +72,9 @@ def show_player_status(status: dict) -> None:
     print(f"Health: {status['health']}")
     print(f"Aura: {status['aura']}")
     print(f"Position: {status['position']}")
-    print(f"Inventory: {status['inventory']}")
+    print("Inventory:")
+    for i, item in enumerate(status['inventory'], start=1):
+        print(f"{i}: {item}")
 
 def show_tile_status(status: dict) -> None:
     if status["item"]:
