@@ -64,6 +64,20 @@ class Game:
         """Returns player's current options as a list of strs"""
         return command.ALL_COMMANDS
 
+    def get_player_position(self) -> map.Position:
+        return self.map.player_position
+
+    def get_player_tile(self) -> level.Tile | None:
+        x, y = self.get_player_position()
+        return self.level.get_tile(x, y)
+
+    def get_tile_monster(self) -> entities.Monster | None:
+        """Returns the monster on the current tile"""
+        tile = self.get_player_tile()
+        if not tile:
+            return None
+        return tile.monster
+
     def move_player(self, move: str) -> bool:
         """Move the player in the given direction.
         Return a boolean indicating whether the player has moved.
@@ -96,20 +110,20 @@ class Game:
 
     def punch(self) -> bool:
         """Execute a punch"""
-        tile = self.get_player_tile()
-        if not tile or not tile.monster:
+        monster = self.get_tile_monster()
+        if not monster:
             interface.report_no_monster()
             return False
-        self.player.punch(tile.monster)
+        self.player.punch(monster)
         return True
 
     def kick(self) -> bool:
         """Execute a kick"""
-        tile = self.get_player_tile()
-        if not tile or not tile.monster:
+        monster = self.get_tile_monster()
+        if not monster:
             interface.report_no_monster()
             return False
-        self.player.kick(tile.monster)
+        self.player.kick(monster)
         return True
 
     def use_item(self, user: entities.Player, item: items.Item, target: entities.Entity | None = None) -> None:
@@ -201,8 +215,8 @@ class Game:
         else:
             raise ValueError(f"Invalid choice: {choice}")
 
-        tile = self.get_player_tile()
-        if tile and tile.monster:
+        monster = self.get_tile_monster()
+        if monster:
             self.damaged_by_monster()
             self.siphon()
         return result
@@ -230,7 +244,8 @@ class Game:
 
     def siphon(self):
         tile = self.get_player_tile()
-        if (tile and tile.monster and tile.monster.dead()):
+        monster = self.get_tile_monster()
+        if (tile and monster and monster.dead()):
             self.player.gain_health(100)
             self.player.gain_aura(10)
             tile.remove_monster()
@@ -238,16 +253,6 @@ class Game:
             interface.short_pause()
 
     def damaged_by_monster(self):
-        tile = self.get_player_tile()
-        if (
-            (tile and tile.monster and not tile.monster.dead())
-            and not self.player.dead()
-        ):
-            self.player.lose_health(tile.monster.damage)
-
-    def get_player_position(self) -> map.Position:
-        return self.map.player_position
-
-    def get_player_tile(self) -> level.Tile | None:
-        x, y = self.get_player_position()
-        return self.level.get_tile(x, y)
+        monster = self.get_tile_monster()
+        if monster and not monster.dead() and not self.player.dead():
+            self.player.lose_health(monster.damage)
