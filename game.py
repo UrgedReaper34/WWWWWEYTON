@@ -1,3 +1,8 @@
+"""game.py
+
+This module contains the Game class, which represents the game state.
+"""
+
 import command
 import entities
 import gamedata
@@ -8,6 +13,8 @@ import map
 import storyline
 from level import Tile
 from map import Map
+
+
 
 
 class Game:
