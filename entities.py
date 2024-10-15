@@ -47,12 +47,6 @@ class Player(Entity):
     def remove_item(self, item: items.Item):
         self.inventory.remove(item)
 
-    def punch(self, monster: "Monster") -> None:
-        monster.take_damage(int(5 * (1 + self.aura / 100)))
-
-    def kick(self, monster: "Monster") -> None:
-        monster.take_damage(int(10 * (1 + self.aura / 100)))
-
     def status(self) -> dict:
         statusdata = super().status()
         statusdata["aura"] = self.aura

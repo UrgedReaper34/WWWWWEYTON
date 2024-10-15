@@ -111,19 +111,21 @@ class Game:
     def punch(self) -> bool:
         """Execute a punch"""
         monster = self.get_tile_monster()
+        player = self.player
         if not monster:
             interface.report_no_monster()
             return False
-        self.player.punch(monster)
+        monster.take_damage(int(5 * (1 + player.aura / 100)))
         return True
 
     def kick(self) -> bool:
         """Execute a kick"""
         monster = self.get_tile_monster()
+        player = self.player
         if not monster:
             interface.report_no_monster()
             return False
-        self.player.kick(monster)
+        monster.take_damage(int(10 * (1 + player.aura / 100)))
         return True
 
     def use_item(self, user: entities.Player, item: items.Item, target: entities.Entity | None = None) -> None:
