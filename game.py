@@ -251,16 +251,3 @@ class Game:
     def get_player_tile(self) -> level.Tile | None:
         x, y = self.get_player_position()
         return self.level.get_tile(x, y)
-
-    def get_player_inventory(self):
-        name_inventory = {}
-        inventory = self.player.get_inventory()
-        for item in inventory:
-            name_inventory[inventory.index(item) + 1] = item.name
-        return name_inventory
-
-    def get_player_health(self):
-        return self.player.get_health()
-
-    def get_player_aura(self):
-        return self.player.get_aura()

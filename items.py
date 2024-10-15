@@ -59,6 +59,7 @@ def create_item(data: dict) -> Item:
         return create_aura_potion(data)
     elif data["type"] == "Weapon":
         return create_weapon(data)
+    raise ValueError(f"Unknown item type: {data['type']}")
 
 
 def create_health_potion(data: dict) -> HealthPotion:

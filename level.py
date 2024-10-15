@@ -12,9 +12,6 @@ class Tile:
         self.description = description
         self.monster = None
         self.item = None
-    
-    def get_description(self) -> str:
-        return self.description
 
     def remove_monster(self) -> None:
         self.monster = None
