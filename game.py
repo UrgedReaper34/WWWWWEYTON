@@ -1,27 +1,13 @@
 import entities
+import gamedata
 import level
 import interface
 import items
 import map
 import storyline
 from level import Tile
-import json
 from map import Map
 from time import sleep
-# Util function for clearing console
-
-with open("Tile_data.json") as f:
-    _tile_data = json.load(f)
-
-with open("monster_data.json") as f:
-    _monster_data = json.load(f)
-
-with open("item_data.json") as f:
-    _item_data = json.load(f)
-
-
-def clear_console():
-    print("\033c", end="", flush=True)
 
 
 class Game:
@@ -42,7 +28,7 @@ class Game:
             y = i // 20 + 1
             x = i % 20 + 1
 
-            for _tile in _tile_data:
+            for _tile in gamedata.tiles:
                 if _tile["position"] == [x, y]:
                     self.tile_list.append(
                         Tile(_tile["position"], _tile["description"]))
@@ -50,7 +36,7 @@ class Game:
             self.tile_list.append(Tile([x, y], "Empty Tile"))
 
     def initialise_monsters(self):
-        for _monster in _monster_data:
+        for _monster in gamedata.monsters:
             monster = entities.Monsters(_monster["name"], _monster["health"],
                                         [], _monster["damage"],
                                         _monster["description"])
@@ -58,7 +44,7 @@ class Game:
 
     def initialise_items(self):
 
-        for _item in _item_data:
+        for _item in gamedata.items:
             if _item["type"] == "HealthPotion":
                 item = items.HealthPotion(_item["type"],
                                           _item["name"],
