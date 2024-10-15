@@ -124,7 +124,7 @@ class Game:
             return False
         return True
 
-    def use_item(self) -> bool:
+    def menu_use_item(self) -> bool:
         """Use the item in the player's inventory according to their choice"""
         monster = self.get_player_tile().get_monster()
         item = interface.prompt_item_choice(self.player.inventory)
@@ -160,7 +160,7 @@ class Game:
             return False
         return True
 
-    def view_item(self) -> bool:
+    def menu_view_item(self) -> bool:
         """View the item in the player's inventory according to their choice"""
         item = interface.prompt_item_choice(self.player.inventory)
         if not item:
@@ -169,7 +169,7 @@ class Game:
         interface.long_pause()
         return True
 
-    def drop_item(self) -> bool:
+    def menu_drop_item(self) -> bool:
         """Drop the item in the player's inventory"""
         item = interface.prompt_item_choice(self.player.inventory)
         if not item:
@@ -202,11 +202,11 @@ class Game:
         elif choice == command.KICK:
             result = self.kick()
         elif choice == command.USE_ITEM:
-            result = self.use_item()
+            result = self.menu_use_item()
         elif choice == command.VIEW_ITEM:
-            result = self.view_item()
+            result = self.menu_view_item()
         elif choice == command.DROP_ITEM:
-            result = self.drop_item()
+            result = self.menu_drop_item()
         elif choice == command.PICKUP_ITEM:
             result = self.pick_up_item()
         elif choice in command.HELP:
