@@ -9,17 +9,15 @@ if __name__ == "__main__":
     game.start()
     while not game.win() and not game.lose():
 
-        x = 'invalid'
-        while x == 'invalid':
+        done = False
+        while not done:
             game.show_status()
-            options = game.get_options()
-            choice = game.prompt_player(''.join(options))
-            x = game.enter(choice)
-            if x == 'invalid':
+            choice = interface.prompt_player_choice(game.get_options())
+            done = game.enter(choice)
+            if done:
                 interface.clear()
-        interface.clear()
     game.show_status()
-    interface.pause()
+    interface.medium_pause()
     interface.clear()
 
     if game.win():

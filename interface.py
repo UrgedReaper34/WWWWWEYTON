@@ -54,6 +54,10 @@ def prompt_name() -> str:
 def prompt_item_number() -> str:
     return input("Enter Item number ")
 
+def prompt_player_choice(options: list[str]) -> str:
+    choice = input(" ".join(options))
+    return choice
+
 def show_player_status(status: dict) -> None:
     linebreak()
     print(f"Name: {status['name']}")

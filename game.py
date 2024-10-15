@@ -94,24 +94,26 @@ class Game:
 
     def get_options(self) -> list[str]:
         """Returns player's current options as a list of strs"""
-        move_options = ["W ", "A ", "S ", "D "]
-        combat_options = ["Z X (item number)\n"]
-        inventory_options = ["V ", "R ", "P ", "help "
-                             "quit "]
+        move_options = ["W", "A", "S", "D"]
+        combat_options = ["Z", "X", "(item number)"]
+        inventory_options = ["V", "R", "P", "help"
+                             "quit"]
 
         return move_options + combat_options + inventory_options
 
-    def move(self, choice):
-
+    def move(self, choice) -> bool:
+        """Move the player according to their choice"""
         check = self.player.move(choice)
         if check == "invalid":
             interface.alert_invalid_tile()
-            return 'invalid'
+            return False
+        return True
 
-    def use_item(self, choice):
+    def use_item(self, choice) -> bool:
+        """Use the item in the player's inventory according to their choice"""
         if int(choice) > len(self.player.inventory):
             interface.alert_invalid_item()
-            return 'invalid'
+            return False
         item = self.player.inventory[int(choice) - 1]
         if item.get_type() == "HealthPotion" or item.get_type(
         ) == "AuraPotion":
@@ -129,49 +131,58 @@ class Game:
                 interface.report_player_item_used(item.name)
             else:
                 interface.report_no_monster()
-                return 'invalid'
+                return False
+        return True
 
-    def punch(self):
+    def punch(self) -> bool:
+        """Execute a punch"""
         if self.get_player_tile().get_monster() is not None:
             self.player.punch(self.get_player_tile().get_monster())
         else:
             interface.report_no_monster()
-            return 'invalid'
+            return False
+        return True
 
-    def kick(self):
+    def kick(self) -> bool:
+        """Execute a kick"""
         if self.get_player_tile().get_monster() is not None:
             self.player.kick(self.get_player_tile().get_monster())
         else:
             interface.report_no_monster()
-            return 'invalid'
+            return False
+        return True
 
     def view_item(self):
         x = input("Enter Item number ")
         if x.isdecimal() is False:
             interface.alert_invalid_input()
-            return 'invalid'
+            return False
         x = int(x)
         if int(x) > len(self.player.inventory):
             interface.alert_invalid_item()
-            return 'invalid'
+            return False
         item = self.player.inventory[x - 1]
         item.display_item()
-        sleep(5)
+        interface.long_pause()
+        return True
 
-    def drop_item(self):
+    def drop_item(self) -> bool:
+        """Drop the item in the player's inventory"""
         x = interface.prompt_item_number()
         if x.isdecimal() is False:
             interface.alert_invalid_input()
-            return 'invalid'
+            return False
         x = int(x)
         if int(x) > len(self.player.inventory):
             interface.alert_invalid_item()
-            return 'invalid'
+            return False
         item = self.player.inventory[x - 1]
         self.player.remove_item(x)
         interface.report_player_item_dropped(item.name)
+        return True
 
-    def pick_up_item(self):
+    def pick_up_item(self) -> bool:
+        """Pick up the item on the current tile"""
         player_tile = self.get_player_tile()
         tile_item = player_tile.get_item()
         if tile_item:
@@ -179,35 +190,42 @@ class Game:
             player_tile.set_item(None)
         interface.report_tile_item_picked_up(tile_item.name if tile_item else None)
         if tile_item:
-            return 'invalid'
+            return False
+        return True
 
-    def enter(self, choice: str):
+    def enter(self, choice: str) -> bool:
+        """Carry out user choice.
+        Returns a bool representing whether the action was carried out.
+        """
         choice = choice.lower()
         if choice in "wasd":
-            self.move(choice)
+            result = self.move(choice)
         elif choice.isdecimal():
-            self.use_item(choice)
-        elif choice in "z":
-            self.punch()
-        elif choice in "x":
-            self.kick()
-        elif choice in "v":
-            self.view_item()
-        elif choice in "r":
-            self.drop_item()
-        elif choice in "p":
-            self.pick_up_item()
-        elif choice in "h" or choice.lower() == "help":
+            result = self.use_item(choice)
+        elif choice == "z":
+            result = self.punch()
+        elif choice == "x":
+            result = self.kick()
+        elif choice == "v":
+            result = self.view_item()
+        elif choice == "r":
+            result = self.drop_item()
+        elif choice == "p":
+            result = self.pick_up_item()
+        elif choice == "h" or choice == "help":
             interface.show_help()
-        elif choice.lower() == 'quit':
+            return True
+        elif choice == 'quit':
             self.player.health = 0
+            return True
         else:
             interface.alert_invalid_option()
-            return 'invalid'
+            return False
 
         if self.get_player_tile().get_monster() is not None:
             self.damaged_by_monster()
             self.siphon()
+        return result
 
     def show_status(self) -> None:
         """Display player's current status"""
