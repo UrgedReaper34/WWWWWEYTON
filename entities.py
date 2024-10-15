@@ -110,6 +110,12 @@ class Monster(Entity):
         print(f'Damage: {self.damage}\n')
 
 
+def create_player(data: dict) -> Player:
+    return Player(data["name"], data["health"], data["aura"])
+
+def create_monster(data: dict) -> Monster:
+    return Monster(data["name"], data["health"], data["damage"], data["description"])
+
 # test
 # person1 = Player("Lleyton",100000,10,[1,2])
 

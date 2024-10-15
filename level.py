@@ -1,6 +1,7 @@
 import random
 
 import entities
+import gamedata
 
 
 class Level:
@@ -13,9 +14,7 @@ class Level:
         self.tile_list = tile_list
         self.monsters_list = monsters_list
         self.items_list = items_list
-        self.BigBoss = entities.Monster(
-            "BIGBOSS", 1000, [20, 10], 250,
-            "FINAL BOSS, Defeat to Complete Level")
+        self.BigBoss = entities.create_monster(gamedata.boss)
 
     def get_floorplan(self):
         """

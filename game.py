@@ -22,11 +22,7 @@ class Game:
         self.tile_list = []
         self.monsters_list = []
         self.items_list = []
-        self.player = entities.Player(
-            name=gamedata.player["name"],
-            health=gamedata.player["health"],
-            aura=gamedata.player["aura"],
-        )
+        self.player = entities.create_player(gamedata.player)
         player_x, player_y = gamedata.player["position"]
         self.map.set_player_position(player_x, player_y)
 
@@ -45,10 +41,8 @@ class Game:
             self.tile_list.append(Tile([x, y], "Empty Tile"))
 
     def initialise_monsters(self):
-        for _monster in gamedata.monsters:
-            monster = entities.Monster(_monster["name"], _monster["health"],
-                                       _monster["damage"],
-                                       _monster["description"])
+        for monsterdata in gamedata.monsters:
+            monster = entities.create_monster(monsterdata)
             self.monsters_list.append(monster)
 
     def initialise_items(self):
