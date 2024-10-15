@@ -69,37 +69,37 @@ class Entity:
 
 class Player(Entity):
 
-    def __init__(self, name, health, aura, position, inventory=[]):
+    def __init__(self, name: str, health: int, aura: int, position, inventory=[]):
         super().__init__(name, health, position)
         self.inventory = inventory
         self.aura = aura
 
-    def get_aura(self):
+    def get_aura(self) -> int:
         return self.aura
 
-    def set_aura(self, aura):
+    def set_aura(self, aura: int):
         self.aura = aura
 
-    def gain_aura(self, aura_gained):
+    def gain_aura(self, aura_gained: int):
         self.aura += aura_gained
 
-    def add_item(self, item):
+    def add_item(self, item: items.Item):
         self.inventory.append(item)
 
     def remove_item(self, item: items.Item):
         self.inventory.remove(item)
 
-    def punch(self, monster):
+    def punch(self, monster: Monster) -> None:
         monster.take_damage(5 * (1 + self.aura / 100))
 
-    def kick(self, monster):
+    def kick(self, monster: Monster) -> None:
         monster.take_damage(10 * (1 + self.aura / 100))
 
-    def use_item(self, item_index, monster):
-        item = self.inventory[item_index]
+    def use_item(self, item: items.Item, monster: Monster) -> None:
+        item = self.inventory[item]
         item.use_item(monster)
 
-    def get_inventory(self):
+    def get_inventory(self) -> list[items.Item]:
         return self.inventory
 
     def status(self) -> dict:
@@ -109,23 +109,23 @@ class Player(Entity):
         return statusdata
 
 
-class Monsters(Entity):
+class Monster(Entity):
 
-    def __init__(self, name, health, position, damage, description):
+    def __init__(self, name: str, health: int, position, damage: int, description: str):
         super().__init__(name, health, position)
         self.damage = damage
         self.description = description
 
-    def get_damage(self):
+    def get_damage(self) -> int:
         return self.damage
 
-    def set_damage(self, damage):
+    def set_damage(self, damage: int) -> int:
         self.damage = damage
 
-    def get_description(self):
+    def get_description(self) -> str:
         return self.description
 
-    def display_monster(self):
+    def display_monster(self) -> None:
         print(f'Monster Name: {self.get_name()}')
         print(f'Monster Health: {self.get_health()}')
         print(f'Monster Description: {self.get_description()}')

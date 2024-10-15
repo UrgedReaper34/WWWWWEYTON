@@ -42,7 +42,7 @@ class Game:
 
     def initialise_monsters(self):
         for _monster in gamedata.monsters:
-            monster = entities.Monsters(_monster["name"], _monster["health"],
+            monster = entities.Monster(_monster["name"], _monster["health"],
                                         [], _monster["damage"],
                                         _monster["description"])
             self.monsters_list.append(monster)
@@ -104,29 +104,22 @@ class Game:
             return False
         return True
 
-    def use_item(self, choice) -> bool:
+    def use_item(self) -> bool:
         """Use the item in the player's inventory according to their choice"""
-        if int(choice) > len(self.player.inventory):
-            interface.alert_invalid_item()
+        monster = self.get_player_tile().get_monster()
+        item = interface.prompt_item_choice(self.player.inventory)
+        if not item:
             return False
-        item = self.player.inventory[int(choice) - 1]
-        if item.get_type() == "HealthPotion" or item.get_type(
-        ) == "AuraPotion":
-            self.player.use_item(
-                int(choice) - 1,
-                self.get_player_tile().get_monster())
-            self.player.remove_item(int(choice) - 1)
+        elif (
+                monster
+                or isinstance(item, (items.HealthPotion, items.AuraPotion))
+        ):
+            self.player.use_item(item, monster)
+            self.player.remove_item(item)
             interface.report_player_item_used(item.name)
         else:
-            if self.get_player_tile().get_monster() is not None:
-                self.player.use_item(
-                    int(choice) - 1,
-                    self.get_player_tile().get_monster())
-                self.player.remove_item(int(choice) - 1)
-                interface.report_player_item_used(item.name)
-            else:
-                interface.report_no_monster()
-                return False
+            interface.report_no_monster()
+            return False
         return True
 
     def punch(self) -> bool:
@@ -185,12 +178,12 @@ class Game:
         choice = choice.lower()
         if choice in command.MOVE:
             result = self.move(choice)
-        elif choice in command.USE_ITEM:
-            result = self.use_item(choice)
         elif choice == command.PUNCH:
             result = self.punch()
         elif choice == command.KICK:
             result = self.kick()
+        elif choice == command.USE_ITEM:
+            result = self.use_item()
         elif choice == command.VIEW_ITEM:
             result = self.view_item()
         elif choice == command.DROP_ITEM:
