@@ -1,63 +1,73 @@
+"""entities.py
+
+Module containing all entities in the game.
+"""
+
 import items
+
+# Positions are represented as a list of two ints
+Position = list[int]
 
 
 class Entity:
 
-    def __init__(self, name, health, position):
+    def __init__(self, name: str, health: int, position: Position):
         self.name = name
         self.health = health
         self.position = position
 
-    def get_name(self):
+    def get_name(self) -> str:
         return self.name
 
-    def get_health(self):
+    def get_health(self) -> int:
         return self.health
 
-    def gain_health(self, gained_health):
+    def gain_health(self, gained_health: int) -> None:
         self.health += gained_health
 
-    def lose_health(self, damage):
+    def lose_health(self, damage: int) -> None:
         self.health -= damage
 
-    def take_damage(self, damage):
+    def take_damage(self, damage: int) -> None:
         self.health -= damage
 
-    def get_position(self):
+    def get_position(self) -> Position:
         return self.position
 
-    def dead(self):
+    def dead(self) -> bool:
         return self.health <= 0
 
-    def move(self, move):
-
-        if move in "Ww":
-            if self.get_position()[1] <= 1:
+    def move(self, move: str) -> str | Position:
+        """Move the entity in the given direction.
+        Returns the new position if the move was successful, otherwise returns
+        'invalid'.
+        """
+        move = move.lower()
+        if move == "w":
+            if self.position[1] <= 1:
                 return "invalid"
             else:
                 self.position[1] -= 1
-                return self.get_position()
-
-        elif move in "Aa":
-            if self.get_position()[0] <= 1:
+                return self.position
+        elif move == "a":
+            if self.position[0] <= 1:
                 return "invalid"
             else:
                 self.position[0] -= 1
-                return self.get_position()
-
-        elif move in "Ss":
-            if self.get_position()[1] >= 20:
+                return self.position
+        elif move == "s":
+            if self.position[1] >= 20:
                 return "invalid"
             else:
                 self.position[1] += 1
-                return self.get_position()
-
-        elif move in "Dd":
-            if self.get_position()[0] >= 20:
+                return self.position
+        elif move == "d":
+            if self.position[0] >= 20:
                 return "invalid"
             else:
                 self.position[0] += 1
-                return self.get_position()
+                return self.position
+        raise ValueError(f"Invalid move: {move}")
 
     def status(self) -> dict:
         return {
@@ -69,10 +79,10 @@ class Entity:
 
 class Player(Entity):
 
-    def __init__(self, name: str, health: int, aura: int, position, inventory=[]):
+    def __init__(self, name: str, health: int, aura: int, position):
         super().__init__(name, health, position)
-        self.inventory = inventory
         self.aura = aura
+        self.inventory = []
 
     def get_aura(self) -> int:
         return self.aura
@@ -89,14 +99,13 @@ class Player(Entity):
     def remove_item(self, item: items.Item):
         self.inventory.remove(item)
 
-    def punch(self, monster: Monster) -> None:
-        monster.take_damage(5 * (1 + self.aura / 100))
+    def punch(self, monster: "Monster") -> None:
+        monster.take_damage(int(5 * (1 + self.aura / 100)))
 
-    def kick(self, monster: Monster) -> None:
-        monster.take_damage(10 * (1 + self.aura / 100))
+    def kick(self, monster: "Monster") -> None:
+        monster.take_damage(int(10 * (1 + self.aura / 100)))
 
-    def use_item(self, item: items.Item, monster: Monster) -> None:
-        item = self.inventory[item]
+    def use_item(self, item: items.Item, monster: "Monster") -> None:
         item.use_item(monster)
 
     def get_inventory(self) -> list[items.Item]:
@@ -111,7 +120,8 @@ class Player(Entity):
 
 class Monster(Entity):
 
-    def __init__(self, name: str, health: int, position, damage: int, description: str):
+    def __init__(self, name: str, health: int, position, damage: int,
+                 description: str):
         super().__init__(name, health, position)
         self.damage = damage
         self.description = description
@@ -119,17 +129,22 @@ class Monster(Entity):
     def get_damage(self) -> int:
         return self.damage
 
-    def set_damage(self, damage: int) -> int:
+    def set_damage(self, damage: int) -> None:
         self.damage = damage
 
     def get_description(self) -> str:
         return self.description
 
+    def status(self) -> dict:
+        statusdata = super().status()
+        statusdata["damage"] = self.damage
+        return statusdata
+
     def display_monster(self) -> None:
-        print(f'Monster Name: {self.get_name()}')
-        print(f'Monster Health: {self.get_health()}')
-        print(f'Monster Description: {self.get_description()}')
-        print(f'Damage: {self.get_damage()}\n')
+        print(f'Monster Name: {self.name}')
+        print(f'Monster Health: {self.health}')
+        print(f'Monster Description: {self.description}')
+        print(f'Damage: {self.damage}\n')
 
 
 # test
