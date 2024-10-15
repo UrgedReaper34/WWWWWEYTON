@@ -1,0 +1,8 @@
+{
+    "player": {
+        "name": "",
+        "health": 100,
+        "aura": 0,
+        "position": [1, 1]
+    }
+}

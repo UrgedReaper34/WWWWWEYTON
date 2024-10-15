@@ -18,7 +18,12 @@ class Game:
         self.tile_list = []
         self.monsters_list = []
         self.items_list = []
-        self.player = entities.Player("", health=100, aura=0, position=[1, 1])
+        self.player = entities.Player(
+            name=gamedata.player["name"],
+            health=gamedata.player["health"],
+            aura=gamedata.player["aura"],
+            position=gamedata.player["position"]
+        )
         self.map = Map()
 
         # TODO: read tile data from storyline and populate level tilelist
