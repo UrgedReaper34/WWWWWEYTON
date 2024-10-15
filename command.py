@@ -1,11 +1,3 @@
-def get_options(self) -> list[str]:
-        """Returns player's current options as a list of strs"""
-        move_options = ["w", "a", "s", "d"]
-        combat_options = ["z", "x"]
-        item_options = [str(i) for i in range(10)]
-        inventory_options = ["v", "r", "p", "help", "quit"]
-        return move_options + combat_options + item_options + inventory_options
-
 """command.py
 
 This module contains constants representing possible player inputs, and the commands they represent.
