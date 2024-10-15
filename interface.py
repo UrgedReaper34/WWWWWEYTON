@@ -55,7 +55,11 @@ def prompt_item_number() -> str:
     return input("Enter Item number ")
 
 def prompt_player_choice(options: list[str]) -> str:
-    choice = input(" ".join(options))
+    optionstr = " ".join(options)
+    choice = input(optionstr)
+    while choice not in options:
+        alert_invalid_option()
+        choice = input(optionstr)
     return choice
 
 def show_player_status(status: dict) -> None:
