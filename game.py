@@ -148,10 +148,7 @@ class Game:
         return True
 
     def view_item(self) -> bool:
-        x = input("Enter Item number ")
-        if not x.isdecimal():
-            interface.alert_invalid_input()
-            return False
+        x = interface.prompt_item_number()
         x = int(x)
         if int(x) > len(self.player.inventory):
             interface.alert_invalid_item()
@@ -164,9 +161,6 @@ class Game:
     def drop_item(self) -> bool:
         """Drop the item in the player's inventory"""
         x = interface.prompt_item_number()
-        if not x.isdecimal():
-            interface.alert_invalid_input()
-            return False
         x = int(x)
         if int(x) > len(self.player.inventory):
             interface.alert_invalid_item()
