@@ -148,25 +148,20 @@ class Game:
         return True
 
     def view_item(self) -> bool:
-        x = interface.prompt_item_number()
-        x = int(x)
-        if int(x) > len(self.player.inventory):
-            interface.alert_invalid_item()
+        """View the item in the player's inventory according to their choice"""
+        item = interface.prompt_item_choice(self.player.inventory)
+        if not item:
             return False
-        item = self.player.inventory[x - 1]
         item.display_item()
         interface.long_pause()
         return True
 
     def drop_item(self) -> bool:
         """Drop the item in the player's inventory"""
-        x = interface.prompt_item_number()
-        x = int(x)
-        if int(x) > len(self.player.inventory):
-            interface.alert_invalid_item()
+        item = interface.prompt_item_choice(self.player.inventory)
+        if not item:
             return False
-        item = self.player.inventory[x - 1]
-        self.player.remove_item(x)
+        self.player.remove_item(item)
         interface.report_player_item_dropped(item.name)
         return True
 
@@ -177,10 +172,10 @@ class Game:
         if tile_item:
             self.player.add_item(tile_item)
             player_tile.set_item(None)
-        interface.report_tile_item_picked_up(tile_item.name if tile_item else None)
-        if tile_item:
-            return False
-        return True
+        interface.report_tile_item_picked_up(
+            tile_item.name if tile_item else None
+        )
+        return True if tile_item else False
 
     def enter(self, choice: str) -> bool:
         """Carry out user choice.

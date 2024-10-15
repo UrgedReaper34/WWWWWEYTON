@@ -1,3 +1,6 @@
+import items
+
+
 class Entity:
 
     def __init__(self, name, health, position):
@@ -83,8 +86,8 @@ class Player(Entity):
     def add_item(self, item):
         self.inventory.append(item)
 
-    def remove_item(self, item_index):
-        self.inventory.pop(item_index)
+    def remove_item(self, item: items.Item):
+        self.inventory.remove(item)
 
     def punch(self, monster):
         monster.take_damage(5 * (1 + self.aura / 100))

@@ -1,5 +1,7 @@
 import time
+from typing import TypeVar
 
+I = TypeVar("I")
 ESC = "\033c"
 
 
@@ -51,12 +53,36 @@ def alert_invalid_tile():
 def prompt_name() -> str:
     return input("Brave adventurer! What is your name? \n")
 
-def prompt_item_number() -> str:
-    choice = input("Enter Item number ")
-    while not choice.isdecimal():
+def prompt_item_number(exit="exit") -> str | None:
+    """Prompt player for a number.
+    Validates that the input is a number, otherwise alerts the player and
+    prompts again.
+    Returns the number.
+    """
+    choice = input("Enter Item number: ")
+    while not choice.isdecimal() or choice != exit:
         alert_invalid_input()
         choice = input("Enter Item number ")
-    return choice
+    return choice if choice != exit else None
+
+def prompt_item_choice(items: list[I]) -> I | None:
+    """Prompt player for an item number, corresponding to a list of items.
+    Validates that the input is a number, and that the number is within the
+    range of the list of items, otherwise alerts the player and prompts again.
+    Returns the item corresponding to the number.
+
+    The list of items is assumed to have been displayed to the user prior to
+    calling this function.
+    """
+    # Items are enumerated starting from 1
+    num = prompt_item_number()
+    while num and not 0 < int(num) <= len(items):
+        alert_invalid_item()
+        num = prompt_item_number()
+    if not num:
+        return None
+    index = int(num) - 1
+    return items[index]
 
 def prompt_player_choice(options: list[str]) -> str:
     optionstr = " ".join(options)
