@@ -12,9 +12,6 @@ import items
 import map
 import storyline
 from level import Tile
-from map import Map
-
-
 
 
 class Game:
@@ -29,9 +26,9 @@ class Game:
             name=gamedata.player["name"],
             health=gamedata.player["health"],
             aura=gamedata.player["aura"],
-            position=gamedata.player["position"]
         )
-        self.map = Map()
+        player_x, player_y = gamedata.player["position"]
+        self.map.set_player_position(player_x, player_y)
 
         # TODO: read tile data from storyline and populate level tilelist
 
@@ -50,8 +47,8 @@ class Game:
     def initialise_monsters(self):
         for _monster in gamedata.monsters:
             monster = entities.Monster(_monster["name"], _monster["health"],
-                                        [], _monster["damage"],
-                                        _monster["description"])
+                                       _monster["damage"],
+                                       _monster["description"])
             self.monsters_list.append(monster)
 
     def initialise_items(self):
@@ -103,10 +100,32 @@ class Game:
         """Returns player's current options as a list of strs"""
         return command.ALL_COMMANDS
 
+    def move_player(self, move: str) -> bool:
+        """Move the player in the given direction.
+        Return a boolean indicating whether the player has moved.
+        Move is assumed to be a valid move command.
+        """
+        move = move.lower()
+        player_x, player_y = self.get_player_position()
+        if move == "w":
+            player_y -= 1
+        elif move == "s":
+            player_y += 1
+        elif move == "a":
+            player_x -= 1
+        elif move == "d":
+            player_x += 1
+        else:
+            raise ValueError(f"Invalid move: {move}")
+        if not self.map.is_valid_coord(player_x, player_y):
+            return False
+        self.map.set_player_position(player_x, player_y)
+        return True
+
     def move(self, choice) -> bool:
         """Move the player according to their choice"""
-        check = self.player.move(choice)
-        if check == "invalid":
+        done = self.move_player(choice)
+        if not done:
             interface.alert_invalid_tile()
             return False
         return True
@@ -173,8 +192,7 @@ class Game:
             self.player.add_item(tile_item)
             player_tile.set_item(None)
         interface.report_tile_item_picked_up(
-            tile_item.name if tile_item else None
-        )
+            tile_item.name if tile_item else None)
         return True if tile_item else False
 
     def enter(self, choice: str) -> bool:
@@ -217,24 +235,30 @@ class Game:
         tile_item = player_tile.get_item()
         tile_monster = player_tile.get_monster()
         player_status = self.player.status()
+        # On the map, positions are shown with origin position (1, 1)
+        # so x and y coords need to be incremented
+        player_x, player_y = self.get_player_position()
+        player_status["position"] = (player_x + 1, player_y + 1)
         player_status["tile_description"] = player_tile.get_description()
         interface.show_player_status(player_status)
         tile_status = {
             "item": tile_item.as_dict() if tile_item else None,
             "monster": tile_monster.as_dict() if tile_monster else None
         }
+        # FIX: update tile item and monster position
         interface.show_tile_status(tile_status)
 
-        self.map.set_player_position(self.get_player_position()[0] - 1,
-                                     self.get_player_position()[1] - 1)
+        
+        # self.map.set_player_position(self.get_player_position()[0] - 1,
+        #                              self.get_player_position()[1] - 1)
 
-        if tile_item is not None:
-            self.map.set_item_position(self.get_player_position()[0] - 1,
-                                       self.get_player_position()[1] - 1)
+        # if tile_item is not None:
+        #     self.map.set_item_position(self.get_player_position()[0] - 1,
+        #                                self.get_player_position()[1] - 1)
 
-        if tile_monster is not None:
-            self.map.set_monsters_position(self.get_player_position()[0] - 1,
-                                           self.get_player_position()[1] - 1)
+        # if tile_monster is not None:
+        #     self.map.set_monsters_position(self.get_player_position()[0] - 1,
+        #                                    self.get_player_position()[1] - 1)
 
         self.map.display_map()
 
@@ -253,8 +277,8 @@ class Game:
         if not tile_monster.dead() and not self.player.dead():
             self.player.lose_health(tile_monster.get_damage())
 
-    def get_player_position(self):
-        return self.player.get_position()
+    def get_player_position(self) -> map.Position:
+        return self.map.player_position
 
     def get_player_tile(self):
         for tile in self.tile_list:

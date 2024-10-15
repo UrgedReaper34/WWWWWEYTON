@@ -11,10 +11,9 @@ Position = list[int]
 
 class Entity:
 
-    def __init__(self, name: str, health: int, position: Position):
+    def __init__(self, name: str, health: int):
         self.name = name
         self.health = health
-        self.position = position
 
     def get_name(self) -> str:
         return self.name
@@ -31,56 +30,20 @@ class Entity:
     def take_damage(self, damage: int) -> None:
         self.health -= damage
 
-    def get_position(self) -> Position:
-        return self.position
-
     def dead(self) -> bool:
         return self.health <= 0
-
-    def move(self, move: str) -> str | Position:
-        """Move the entity in the given direction.
-        Returns the new position if the move was successful, otherwise returns
-        'invalid'.
-        """
-        move = move.lower()
-        if move == "w":
-            if self.position[1] <= 1:
-                return "invalid"
-            else:
-                self.position[1] -= 1
-                return self.position
-        elif move == "a":
-            if self.position[0] <= 1:
-                return "invalid"
-            else:
-                self.position[0] -= 1
-                return self.position
-        elif move == "s":
-            if self.position[1] >= 20:
-                return "invalid"
-            else:
-                self.position[1] += 1
-                return self.position
-        elif move == "d":
-            if self.position[0] >= 20:
-                return "invalid"
-            else:
-                self.position[0] += 1
-                return self.position
-        raise ValueError(f"Invalid move: {move}")
 
     def status(self) -> dict:
         return {
             "name": self.name,
             "health": self.health,
-            "position": self.position
         }
 
 
 class Player(Entity):
 
-    def __init__(self, name: str, health: int, aura: int, position):
-        super().__init__(name, health, position)
+    def __init__(self, name: str, health: int, aura: int):
+        super().__init__(name, health)
         self.aura = aura
         self.inventory = []
 
@@ -120,9 +83,9 @@ class Player(Entity):
 
 class Monster(Entity):
 
-    def __init__(self, name: str, health: int, position, damage: int,
+    def __init__(self, name: str, health: int, damage: int,
                  description: str):
-        super().__init__(name, health, position)
+        super().__init__(name, health)
         self.damage = damage
         self.description = description
 
