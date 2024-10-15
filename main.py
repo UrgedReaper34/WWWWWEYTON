@@ -1,9 +1,10 @@
 # Import statements
 
 from game import Game
-from time import sleep
-if __name__ == "__main__":
+import interface
 
+
+if __name__ == "__main__":
     game = Game()
     game.start()
     while not game.win() and not game.lose():
@@ -15,12 +16,11 @@ if __name__ == "__main__":
             choice = game.prompt_player(''.join(options))
             x = game.enter(choice)
             if x == 'invalid':
-                print("\033c", end="", flush=True)
-
-        print("\033c", end="", flush=True)
+                interface.clear()
+        interface.clear()
     game.show_status()
-    sleep(3)
-    print("\033c", end="", flush=True)
+    interface.pause()
+    interface.clear()
 
     if game.win():
         print("You have slained the BigBoss, you win")

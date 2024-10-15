@@ -56,6 +56,13 @@ class Entity:
                 self.position[0] += 1
                 return self.get_position()
 
+    def status(self) -> dict:
+        return {
+            "name": self.name,
+            "health": self.health,
+            "position": self.position
+        }
+
 
 class Player(Entity):
 
@@ -91,6 +98,12 @@ class Player(Entity):
 
     def get_inventory(self):
         return self.inventory
+
+    def status(self) -> dict:
+        statusdata = super().status()
+        statusdata["aura"] = self.aura
+        statusdata["inventory"] = [item.name for item in self.inventory]
+        return statusdata
 
 
 class Monsters(Entity):

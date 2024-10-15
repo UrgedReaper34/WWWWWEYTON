@@ -28,6 +28,14 @@ class HealthPotion(Item):
     def use_item(self, monster):
         self.player.gain_health(self.effect)
 
+    def as_dict(self) -> dict:
+        return {
+            "type": self.type,
+            "name": self.name,
+            "description": self.description,
+            "effect": self.effect
+        }
+
     def display_item(self):
         print(f'Item Type: {self.get_type()}')
         print(f'Item Name: {self.get_name()}')
@@ -44,6 +52,14 @@ class AuraPotion(Item):
     def use_item(self, monster):
         self.player.gain_aura(self.effect)
 
+    def as_dict(self) -> dict:
+        return {
+            "type": self.type,
+            "name": self.name,
+            "description": self.description,
+            "effect": self.effect
+        }
+
     def display_item(self):
         print(f'Item Type: {self.get_type()}')
         print(f'Item Name: {self.get_name()}')
@@ -59,6 +75,14 @@ class Weapon(Item):
 
     def use_item(self, monster):
         monster.take_damage(self.effect * (1 + self.player.aura / 100))
+
+    def as_dict(self) -> dict:
+        return {
+            "type": self.type,
+            "name": self.name,
+            "description": self.description,
+            "damage": self.effect
+        }
 
     def display_item(self):
         print(f'Item Type: {self.get_type()}')
