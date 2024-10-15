@@ -108,7 +108,7 @@ class Game:
             return False
         return True
 
-    def punch(self) -> bool:
+    def player_punch(self) -> bool:
         """Execute a punch"""
         monster = self.get_tile_monster()
         player = self.player
@@ -118,7 +118,7 @@ class Game:
         monster.take_damage(int(5 * (1 + player.aura / 100)))
         return True
 
-    def kick(self) -> bool:
+    def player_kick(self) -> bool:
         """Execute a kick"""
         monster = self.get_tile_monster()
         player = self.player
@@ -197,9 +197,9 @@ class Game:
         if choice in command.MOVE:
             result = self.move(choice)
         elif choice == command.PUNCH:
-            result = self.punch()
+            result = self.player_punch()
         elif choice == command.KICK:
-            result = self.kick()
+            result = self.player_kick()
         elif choice == command.USE_ITEM:
             result = self.menu_use_item()
         elif choice == command.VIEW_ITEM:
