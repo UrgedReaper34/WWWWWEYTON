@@ -1,4 +1,4 @@
-"""symbol.py
+"""mapsymbol.py
 
 This module contains the symbols used in the game.
 """

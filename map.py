@@ -57,11 +57,11 @@ class Map:
 
     def set_player_position(self, new_x: int, new_y: int) -> None:
         self.validate_coord(new_x, new_y)
-        old_x, old_y = self.player_position
-        if self.grid[old_y][old_x] == sym.PLAYER:
-            self.grid[old_y][old_x] = sym.EMPTY
+        x, y = self.get_player_position()
+        if self.get_grid(x, y) == sym.PLAYER:
+            self.set_grid(x, y, sym.EMPTY)
         self.player_position = (new_x, new_y)
-        self.grid[new_y][new_x] = sym.PLAYER
+        self.set_grid(new_x, new_y, sym.PLAYER)
 
     def set_monsters_position(self, x: int, y: int) -> None:
         """Put a monster at the given position."""
