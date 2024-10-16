@@ -84,13 +84,13 @@ class Game:
         """
         move = move.lower()
         player_x, player_y = self.get_player_position()
-        if move == "w":
+        if move == command.MOVE_UP:
             player_y -= 1
-        elif move == "s":
+        elif move == command.MOVE_DOWN:
             player_y += 1
-        elif move == "a":
+        elif move == command.MOVE_LEFT:
             player_x -= 1
-        elif move == "d":
+        elif move == command.MOVE_RIGHT:
             player_x += 1
         else:
             raise ValueError(f"Invalid move: {move}")
