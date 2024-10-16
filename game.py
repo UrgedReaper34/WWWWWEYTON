@@ -1,83 +1,56 @@
+"""game.py
+
+This module contains the Game class, which represents the game state.
+"""
+
+import command
 import entities
+import gamedata
 import level
+import interface
 import items
 import map
 import storyline
-from level import Tile
-import json
-from map import Map
-from time import sleep
-# Util function for clearing console
 
-with open("Tile_data.json") as f:
-    _tile_data = json.load(f)
-
-with open("monster_data.json") as f:
-    _monster_data = json.load(f)
-
-with open("item_data.json") as f:
-    _item_data = json.load(f)
-
-def clear_console():
-    print("\033c", end="", flush=True)
 
 class Game:
+
     def __init__(self):
         self.map = map.Map()
         self.storyline = storyline.Storyline()
-        self.tile_list = []
-        self.monsters_list = []
-        self.items_list = []
-        self.player = entities.Player("", health = 100, aura = 0, position = [1,1])
-        self.map = Map()
+        self.level = level.create_level()
+        self.player = entities.create_player(gamedata.player)
+        player_x, player_y = gamedata.player["position"]
+        self.map.set_player_position(player_x, player_y)
 
         # TODO: read tile data from storyline and populate level tilelist
 
     def create_tiles(self):
-        for i in range(400):
-            y = i // 20 + 1
-            x = i % 20 + 1
-
-            for _tile in _tile_data:
-                if _tile["position"] == [x, y]:
-                    self.tile_list.append(Tile(_tile["position"], _tile["description"]))
-
-            self.tile_list.append(Tile([x, y], "Empty Tile"))
-
-
-    def initialise_monsters(self):
-        for _monster in _monster_data:
-            monster = entities.Monsters(_monster["name"], _monster["health"], [], _monster["damage"], _monster["description"])
-            self.monsters_list.append(monster)
-
-    def initialise_items(self):
-
-        for _item in _item_data:
-            if _item["type"] == "HealthPotion": 
-                item = items.HealthPotion(_item["type"], _item["name"], _item["description"], player=self.player, effect=_item["health_gain"])
-
-
-            elif _item["type"] == "AuraPotion": 
-                item = items.AuraPotion(_item["type"], _item["name"], _item["description"], player=self.player, effect =_item["aura_gain"])
-
-
-            else:
-                item = items.Weapon(_item["type"], _item["name"], _item["description"], player=self.player, effect=_item["damage"])
-
-            self.items_list.append(item)
-
-
+        for tiledata in gamedata.tiles:
+            x, y = tiledata["position"]
+            self.level.set_tile(
+                x, y,
+                level.create_tile(tiledata)
+            )
 
     def start(self):
         self.create_tiles()
-        self.initialise_monsters()
-        self.initialise_items()
-        self.level = level.Level(self.tile_list,self.monsters_list,self.items_list)
+        self.level = level.create_level()
         self.level.spawn_BigBoss()
-        self.level.spawn_monsters()
-        self.level.spawn_items()
+        self.level.spawn_monsters(
+            [
+                entities.create_monster(monsterdata)
+                for monsterdata in gamedata.monsters
+            ]
+        )
+        self.level.spawn_items(
+            [
+                items.create_item(itemdata)
+                for itemdata in gamedata.items
+            ]
+        )
         self.storyline.do_intro()
-        name = input("Brave adventurer! What is your name? \n")
+        name = interface.prompt_name()
         self.player.name = name
 
     def win(self):
@@ -88,225 +61,199 @@ class Game:
 
     def get_options(self) -> list[str]:
         """Returns player's current options as a list of strs"""
-        move_options = ["W ", "A ", "S ", "D "]
-        combat_options = ["Z X (item number)\n"]
-        inventory_options = ["V ", "R ", "P ", "help " "quit "]
+        return command.ALL_COMMANDS
 
-    
-        
+    def get_player_position(self) -> map.Position:
+        return self.map.player_position
 
-        return move_options + combat_options + inventory_options
-    def help(self):
-        move_options = ["To move up, enter W\n", "To move down, enter S\n", "To move left, enter A\n", "To move right, enter D\n"]
-        combat_options = ["To use Item, enter the item number\n", "To Punch (5 Damage), enter Z\n", "To kick(10 Damage), enter X\n"]
-        inventory_options = ["To view Item, enter V, followed by the item number\n", "To Drop Item, enter R, followed by the item number\n", "To pick up Item, enter P\n"]
-        for x in (move_options + combat_options + inventory_options + ["To Quit, enter 'quit'\n"]): 
-            print(x)
-        sleep(5)
-    def prompt_player(self, options):
-        choice = input(options)
-        return choice
+    def get_player_tile(self) -> level.Tile | None:
+        x, y = self.get_player_position()
+        return self.level.get_tile(x, y)
 
-    def move(self, choice):
+    def get_tile_monster(self) -> entities.Monster | None:
+        """Returns the monster on the current tile"""
+        tile = self.get_player_tile()
+        if not tile:
+            return None
+        return tile.monster
 
-        check = self.player.move(choice)
-        if check == "invalid":
-            print("This tile does not exist, try moving to another tile")
-            sleep(1)
-            return 'invalid'
-
-    def use_item(self,choice):
-        if int(choice) > len(self.player.inventory):
-            print("Item not in inventory")
-            sleep(1)
-            return 'invalid'
-        item = self.player.inventory[int(choice) - 1]
-        if item.get_type() == "HealthPotion" or item.get_type() == "AuraPotion":
-            self.player.use_item(int(choice) - 1,self.get_player_tile().get_monster())
-            self.player.remove_item(int(choice) - 1)
-            print(f'{item.get_name()} used and removed')
-            sleep(1)
+    def move_player(self, move: str) -> bool:
+        """Move the player in the given direction.
+        Return a boolean indicating whether the player has moved.
+        Move is assumed to be a valid move command.
+        """
+        move = move.lower()
+        player_x, player_y = self.get_player_position()
+        if move == command.MOVE_UP:
+            player_y -= 1
+        elif move == command.MOVE_DOWN:
+            player_y += 1
+        elif move == command.MOVE_LEFT:
+            player_x -= 1
+        elif move == command.MOVE_RIGHT:
+            player_x += 1
         else:
-            if self.get_player_tile().get_monster() is not None:
-                self.player.use_item(int(choice) - 1,self.get_player_tile().get_monster())
-                self.player.remove_item(int(choice) - 1)
-                print(f'{item.get_name()} used and removed')
-                sleep(1)
-            else:
-                print("No monster on tile")
-                sleep(1)
-                return 'invalid'
+            raise ValueError(f"Invalid move: {move}")
+        if not self.map.is_valid_coord(player_x, player_y):
+            return False
+        self.map.set_player_position(player_x, player_y)
+        return True
 
-    def punch(self):
-        if self.get_player_tile().get_monster() is not None:
-            self.player.punch(self.get_player_tile().get_monster())
+    def move(self, choice) -> bool:
+        """Move the player according to their choice"""
+        done = self.move_player(choice)
+        if not done:
+            interface.alert_invalid_tile()
+            return False
+        return True
+
+    def player_punch(self) -> bool:
+        """Execute a punch"""
+        monster = self.get_tile_monster()
+        player = self.player
+        if not monster:
+            interface.report_no_monster()
+            return False
+        monster.take_damage(int(5 * (1 + player.aura / 100)))
+        return True
+
+    def player_kick(self) -> bool:
+        """Execute a kick"""
+        monster = self.get_tile_monster()
+        player = self.player
+        if not monster:
+            interface.report_no_monster()
+            return False
+        monster.take_damage(int(10 * (1 + player.aura / 100)))
+        return True
+
+    def use_item(self, user: entities.Player, item: items.Item, target: entities.Entity | None = None) -> None:
+        """Use the item on the target"""
+        if isinstance(item, items.Potion):
+            if isinstance(item, items.HealthPotion):
+                user.gain_health(item.effect)
+            elif isinstance(item, items.AuraPotion):
+                user.gain_aura(item.effect)
+        elif isinstance(item, items.Weapon):
+            assert target is not None, "Target must be specified for weapons"
+            target.take_damage(int(item.effect * (1 + user.aura / 100)))
         else:
-            print("No monster on tile")
-            sleep(1)
-            return 'invalid'
+            raise ValueError(f"Invalid item type: {type(item)}")
 
-    def kick(self):
-        if self.get_player_tile().get_monster() is not None:
-            self.player.kick(self.get_player_tile().get_monster())
-        else:
-            print("No monster on tile")
-            sleep(1)
-            return 'invalid'
+    def menu_use_item(self) -> bool:
+        """Use the item in the player's inventory according to their choice"""
+        tile = self.get_player_tile()
+        item = interface.prompt_item_choice(self.player.inventory)
+        if not item:
+            return False
+        elif isinstance(item, items.Potion):
+            self.use_item(self.player, item)
+            self.player.remove_item(item)
+            interface.report_player_item_used(item.name)
+        elif isinstance(item, items.Weapon):
+            if not tile or not tile.monster:
+                interface.report_no_monster()
+                return False
+            self.use_item(self.player, item, tile.monster)
+            interface.report_player_item_used(item.name)
+        return True
 
-    def view_item(self):
-        x = input("Enter Item number ")
-        if x.isnumeric() is False:
-            print("Invalid Input")
-            sleep(1)
-            return 'invalid'
-        x = int(x)
-        if int(x) > len(self.player.inventory):
-            print("Item not in inventory")
-            sleep(1)
-            return 'invalid'
-        item = self.player.inventory[x - 1]
+    def menu_view_item(self) -> bool:
+        """View the item in the player's inventory according to their choice"""
+        item = interface.prompt_item_choice(self.player.inventory)
+        if not item:
+            return False
         item.display_item()
-        sleep(5)
+        interface.long_pause()
+        return True
 
-    def drop_item(self):
-        x = input("Enter Item number ")
-        if x.isnumeric() is False:
-            print("Invalid Input")
-            sleep(1)
-            return 'invalid'
-        x = int(x)
-        if int(x) > len(self.player.inventory):
-            print("Item not in inventory")
-            sleep(1)
-            return 'invalid'
-        item = self.player.inventory[x - 1]
-        self.player.remove_item(x)
-        print(f'{item.get_name()} removed')
-        sleep(1)
+    def menu_drop_item(self) -> bool:
+        """Drop the item in the player's inventory"""
+        item = interface.prompt_item_choice(self.player.inventory)
+        if not item:
+            return False
+        self.player.remove_item(item)
+        interface.report_player_item_dropped(item.name)
+        return True
 
-    def pick_up_item(self):
-        player_tile = self.get_player_tile()
-        tile_item = player_tile.get_item()
-        if tile_item is not None:
-            self.player.add_item(tile_item)
-            player_tile.set_item(None)
-            print(f'{tile_item.get_name()} added')
-            sleep(1)
-        else: 
-            print("No item on tile")
-            sleep(1)
-            return 'invalid'
+    def pick_up_item(self) -> bool:
+        """Pick up the item on the current tile"""
+        tile = self.get_player_tile()
+        if not tile or not tile.item:
+            interface.report_no_item()
+            return False
+        self.player.add_item(tile.item)
+        tile.remove_item()
+        interface.report_tile_item_picked_up(tile.item.name)
+        return True
 
-    def enter(self, choice: str):
-        if choice in "WASDwasd":
-            self.move(choice)
-        elif choice.isnumeric():
-            self.use_item(choice)
-        elif choice in "Zz":
-            self.punch()
-        elif choice in "Xx":
-            self.kick()
-        elif choice in "Vv":
-            self.view_item()
-        elif choice in "Rr":
-            self.drop_item()
-        elif choice in "Pp":
-            self.pick_up_item()
-        elif choice in "Hh" or choice.lower() == "help":
-            self.help()
-        elif choice.lower() == 'quit':
+    def enter(self, choice: str) -> bool:
+        """Carry out user choice.
+        Returns a bool representing whether the action was carried out.
+        Validation should be done before passing to this method.
+        """
+        choice = choice.lower()
+        if choice in command.MOVE:
+            result = self.move(choice)
+        elif choice == command.PUNCH:
+            result = self.player_punch()
+        elif choice == command.KICK:
+            result = self.player_kick()
+        elif choice == command.USE_ITEM:
+            result = self.menu_use_item()
+        elif choice == command.VIEW_ITEM:
+            result = self.menu_view_item()
+        elif choice == command.DROP_ITEM:
+            result = self.menu_drop_item()
+        elif choice == command.PICKUP_ITEM:
+            result = self.pick_up_item()
+        elif choice in command.HELP:
+            interface.show_help()
+            return True
+        elif choice == command.QUIT:
             self.player.health = 0
+            return True
         else:
-            print("This is not an option, enter again")
-            sleep(1)
-            return 'invalid'
+            raise ValueError(f"Invalid choice: {choice}")
 
-        if self.get_player_tile().get_monster() is not None:
+        monster = self.get_tile_monster()
+        if monster:
             self.damaged_by_monster()
             self.siphon()
-
+        return result
 
     def show_status(self) -> None:
         """Display player's current status"""
-
-        player_tile = self.get_player_tile()
-        player_position = player_tile.get_position()
-        player_tile_description = player_tile.get_description()
-        tile_item = player_tile.get_item()
-        tile_monster = player_tile.get_monster()
-        player_inventory = self.get_player_inventory()
-        player_health = self.get_player_health()
-        player_aura = self.get_player_aura()
-        print("\n")
-        print(f'Your Name: {self.player.get_name()} \nYour Health: {player_health} \nYour Aura: {player_aura} \nYour position: {player_position}, {player_tile_description} \nYour Inventory: {player_inventory}\n')
-        if tile_item is not None:
-            print("There's an Item on this Tile\n")
-            tile_item.display_item()
+        tile = self.get_player_tile()
+        player_status = self.player.status()
+        # On the map, positions are shown with origin position (1, 1)
+        # so x and y coords need to be incremented
+        player_x, player_y = self.get_player_position()
+        player_status["position"] = (player_x + 1, player_y + 1)
+        if not tile:
+            player_status["tile_description"] = "Empty tile"
+            tile_status = {"item": None, "monster": None}
         else:
-            print("There is no item on this Tile\n")
-
-        if tile_monster is not None:
-            print("There's a Monster on this Tile\n")
-            tile_monster.display_monster()
-        else:
-            print("There is no Monster on this Tile\n")
-
-        self.map.set_player_position(self.get_player_position()[0] - 1, self.get_player_position()[1] - 1)
-        
-        if tile_item is not None:
-            self.map.set_item_position(self.get_player_position()[0] - 1, self.get_player_position()[1] - 1)
-            
-        if tile_monster is not None:
-            self.map.set_monsters_position(self.get_player_position()[0] - 1, self.get_player_position()[1] - 1)
-            
+            player_status["tile_description"] = tile.description
+            tile_status = {
+                "item": tile.item and tile.item.as_dict(),
+                "monster": tile.monster and tile.monster.status()
+            }
+        interface.show_player_status(player_status)
+        interface.show_tile_status(tile_status)
         self.map.display_map()
 
-
     def siphon(self):
-        player_tile = self.get_player_tile()
-        if player_tile.get_monster().dead():
+        tile = self.get_player_tile()
+        monster = self.get_tile_monster()
+        if (tile and monster and monster.dead()):
             self.player.gain_health(100)
             self.player.gain_aura(10)
-            player_tile.set_monster(None)
-            print("You have killed the monster and gained 100 health")
-            sleep(1)
+            tile.remove_monster()
+            interface.report_monster_killed()
+            interface.short_pause()
 
     def damaged_by_monster(self):
-        player_tile = self.get_player_tile()
-        tile_monster = player_tile.get_monster()
-        if not tile_monster.dead() and not self.player.dead():
-            self.player.lose_health(tile_monster.get_damage())         
-
-    def get_player_position(self):
-        return self.player.get_position()
-
-    def get_player_tile(self):
-        for tile in self.tile_list:
-            if self.get_player_position() == tile.get_position():
-                return tile
-        else:
-            return self.tile_list[0]
-
-
-
-
-    def get_player_inventory(self):
-        name_inventory = {}
-        inventory = self.player.get_inventory()
-        for item in inventory:
-            name_inventory[inventory.index(item) + 1] = item.get_name()
-        return name_inventory
-
-
-
-    def get_player_health(self):
-        return self.player.get_health()
-
-    def get_player_aura(self):
-        return self.player.get_aura()
-
-
-
-
-
-
+        monster = self.get_tile_monster()
+        if monster and not monster.dead() and not self.player.dead():
+            self.player.lose_health(monster.damage)
